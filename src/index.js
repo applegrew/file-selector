@@ -65,8 +65,9 @@ export default class FileSelectorTool {
   * @param {object} config
   * @param {API} api
   */
-  constructor({ data, config, api }) {
+  constructor({ data, config, api, block}) {
     this.api = api;
+    this.block = block;
     
     this.nodes = {
       wrapper: null,
@@ -424,6 +425,7 @@ export default class FileSelectorTool {
   */
   set data(data) {
     this._data = data || {};
+    this.block.dispatchChange();
   }
   
   /**
