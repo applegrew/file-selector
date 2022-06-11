@@ -1,4 +1,4 @@
-.cdx-attaches {
+.cdx-file-selector {
   &--with-file {
     display: flex;
     padding: 13px 20px;
@@ -34,6 +34,10 @@
         background: #fff;
         line-height: 150%;
         content: attr(data-extension);
+      }
+
+      &.longer::before {
+        left: 6px;
       }
 
       svg {

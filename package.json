@@ -1,7 +1,7 @@
 {
-  "name": "@editorjs/attaches",
+  "name": "@applegrew/file-selector",
   "version": "1.2.1",
-  "repository": "https://github.com/editor-js/attaches",
+  "repository": "https://github.com/applegrew/file-selector",
   "license": "MIT",
   "scripts": {
     "build": "webpack --mode production",
@@ -23,7 +23,7 @@
     "@babel/core": "^7.14.2",
     "@babel/preset-env": "^7.14.2",
     "@codexteam/ajax": "^4.0.1",
-    "babel-loader": "^8.2.2",
+    "babel-loader": "^8.2.5",
     "css-loader": "^1.0.0",
     "eslint": "^7.32.0",
     "eslint-config-codex": "^1.6.4",
@@ -37,7 +37,9 @@
     "style-loader": "^0.21.0",
     "svg-inline-loader": "^0.8.2",
     "to-string-loader": "^1.2.0",
-    "webpack": "^4.29.6",
-    "webpack-cli": "^3.3.0"
+    "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "webpack": "^5.73.0"
   }
 }

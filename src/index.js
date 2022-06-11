@@ -4,143 +4,142 @@ import Uploader from './uploader';
 import Icon from './svg/toolbox.svg';
 import FileIcon from './svg/standard.svg';
 import CustomFileIcon from './svg/custom.svg';
-import DownloadIcon from './svg/arrow-download.svg';
+// import DownloadIcon from './svg/arrow-download.svg';
 
 const LOADER_TIMEOUT = 500;
 
 /**
- * @typedef {object} AttachesToolData
- * @description Attaches Tool's output data format
- * @property {AttachesFileData} file - object containing information about the file
- * @property {string} title - file's title
- */
+* @typedef {object} file-selectorToolData
+* @description file-selector Tool's output data format
+* @property {file-selectorFileData} file - object containing information about the file
+* @property {string} title - file's title
+*/
 
 /**
- * @typedef {object} AttachesFileData
- * @description Attaches Tool's file format
- * @property {string} [url] - file's upload url
- * @property {string} [size] - file's size
- * @property {string} [extension] - file's extension
- * @property {string} [name] - file's name
- */
+* @typedef {object} file-selectorFileData
+* @description file-selector Tool's file format
+* @property {string} [url] - file's upload url
+* @property {string} [size] - file's size
+* @property {string} [extension] - file's extension
+* @property {string} [name] - file's name
+*/
 
 /**
- * @typedef {object} FileData
- * @description Attaches Tool's response from backend
- * @property {string} url - file's url
- * @property {string} name - file's name with extension
- * @property {string} extension - file's extension
- */
+* @typedef {object} FileData
+* @description file-selector Tool's response from backend
+* @property {string} url - file's url
+* @property {string} name - file's name with extension
+* @property {string} extension - file's extension
+*/
 
 /**
- * @typedef {object} UploadResponseFormat
- * @description This format expected from backend on file upload
- * @property {number} success  - 1 for successful uploading, 0 for failure
- * @property {FileData} file - backend response with uploaded file data.
- */
+* @typedef {object} UploadResponseFormat
+* @description This format expected from backend on file upload
+* @property {number} success  - 1 for successful uploading, 0 for failure
+* @property {FileData} file - backend response with uploaded file data.
+*/
 
 /**
- * @typedef {object} AttachesToolConfig
- * @description Config supported by Tool
- * @property {string} endpoint - file upload url
- * @property {string} field - field name for uploaded file
- * @property {string} types - available mime-types
- * @property {string} placeholder
- * @property {string} errorMessage
- * @property {object} [uploader] - optional custom uploader
- * @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - custom method that upload file and returns response
- */
+* @typedef {object} file-selectorToolConfig
+* @description Config supported by Tool
+* @property {string} endpoint - file upload url
+* @property {string} field - field name for uploaded file
+* @property {string} types - available mime-types
+* @property {string} placeholder
+* @property {string} errorMessage
+* @property {object} [uploader] - optional custom uploader
+* @property {function(File): Promise.<UploadResponseFormat>} [uploader.uploadByFile] - custom method that upload file and returns response
+*/
 
 /**
- * @class AttachesTool
- * @classdesc AttachesTool for Editor.js 2.0
- *
- * @property {API} api - Editor.js API
- * @property {AttachesToolData} data
- * @property {AttachesToolConfig} config
- */
-export default class AttachesTool {
+* @class file-selectorTool
+* @classdesc file-selectorTool for Editor.js 2.0
+*
+* @property {API} api - Editor.js API
+* @property {file-selectorToolData} data
+* @property {file-selectorToolConfig} config
+*/
+export default class FileSelectorTool {
   /**
-   * @param {AttachesToolData} data
-   * @param {object} config
-   * @param {API} api
-   */
+  * @param {file-selectorToolData} data
+  * @param {object} config
+  * @param {API} api
+  */
   constructor({ data, config, api }) {
     this.api = api;
-
+    
     this.nodes = {
       wrapper: null,
       button: null,
       title: null
     };
-
-    this._data = {
+    
+    this._displayData = {
       file: {},
       title: ''
     };
-
+    
     this.config = {
+      settings: config.settings || [],
       endpoint: config.endpoint || '',
-      field: config.field || 'file',
       types: config.types || '*',
       buttonText: config.buttonText || 'Select file to upload',
       errorMessage: config.errorMessage || 'File upload failed',
       uploader: config.uploader || undefined,
-      additionalRequestHeaders: config.additionalRequestHeaders || {}
     };
-
+    
     this.data = data;
-
+    
     /**
-     * Module for files uploading
-     */
+    * Module for files uploading
+    */
     this.uploader = new Uploader({
       config: this.config,
       onUpload: (response) => this.onUpload(response),
       onError: (error) => this.uploadingFailed(error)
     });
-
+    
     this.enableFileUpload = this.enableFileUpload.bind(this);
   }
-
+  
   /**
-   * Get Tool toolbox settings
-   * icon - Tool icon's SVG
-   * title - title to show in toolbox
-   */
+  * Get Tool toolbox settings
+  * icon - Tool icon's SVG
+  * title - title to show in toolbox
+  */
   static get toolbox() {
     return {
       icon: Icon,
-      title: 'Attaches'
+      title: 'File'
     };
   }
-
+  
   /**
-   * Tool's CSS classes
-   */
+  * Tool's CSS classes
+  */
   get CSS() {
     return {
       baseClass: this.api.styles.block,
       apiButton: this.api.styles.button,
       loader: this.api.styles.loader,
       /**
-       * Tool's classes
-       */
-      wrapper: 'cdx-attaches',
-      wrapperWithFile: 'cdx-attaches--with-file',
-      wrapperLoading: 'cdx-attaches--loading',
-      button: 'cdx-attaches__button',
-      title: 'cdx-attaches__title',
-      size: 'cdx-attaches__size',
-      downloadButton: 'cdx-attaches__download-button',
-      fileInfo: 'cdx-attaches__file-info',
-      fileIcon: 'cdx-attaches__file-icon'
+      * Tool's classes
+      */
+      wrapper: 'cdx-file-selector',
+      wrapperWithFile: 'cdx-file-selector--with-file',
+      wrapperLoading: 'cdx-file-selector--loading',
+      button: 'cdx-file-selector__button',
+      title: 'cdx-file-selector__title',
+      size: 'cdx-file-selector__size',
+      downloadButton: 'cdx-file-selector__download-button',
+      fileInfo: 'cdx-file-selector__file-info',
+      fileIcon: 'cdx-file-selector__file-icon'
     };
   }
-
+  
   /**
-   * Possible files' extension colors
-   */
+  * Possible files' extension colors
+  */
   get EXTENSIONS() {
     return {
       doc: '#3e74da',
@@ -155,6 +154,7 @@ export default class AttachesTool {
       mp3: '#eab456',
       mp4: '#f676a6',
       xls: '#3f9e64',
+      xlsx: '#3f9e64',
       html: '#2988f0',
       htm: '#2988f0',
       png: '#f676a6',
@@ -174,95 +174,104 @@ export default class AttachesTool {
       csv: '#3f9e64'
     };
   }
-
+  
   /**
-   * Validate block data:
-   * - check for emptiness
-   *
-   * @param {AttachesToolData} savedData — data received after saving
-   * @returns {boolean} false if saved data is not correct, otherwise true
-   * @public
-   */
+  * Validate block data:
+  * - check for emptiness
+  *
+  * @param {file-selectorToolData} savedData — data received after saving
+  * @returns {boolean} false if saved data is not correct, otherwise true
+  * @public
+  */
   validate(savedData) {
-    if (!savedData.file.url) {
-      return false;
-    }
-
     return true;
   }
-
+  
   /**
-   * Return Block data
-   *
-   * @param {HTMLElement} toolsContent
-   * @returns {AttachesToolData}
-   */
-  save(toolsContent) {
-    /**
-     * If file was uploaded
-     */
-    if (this.pluginHasData()) {
-      const title = toolsContent.querySelector(`.${this.CSS.title}`).innerHTML;
-
-      Object.assign(this.data, { title });
-    }
-
+  * Return Block data
+  *
+  * @param {HTMLElement} toolsContent
+  * @returns {file-selectorToolData}
+  */
+  save(toolsContent) {    
     return this.data;
   }
-
+  
   /**
-   * Renders Block content
-   *
-   * @returns {HTMLDivElement}
-   */
+  * Renders Block content
+  *
+  * @returns {HTMLDivElement}
+  */
   render() {
     const holder = this.make('div', this.CSS.baseClass);
-
+    
     this.nodes.wrapper = this.make('div', this.CSS.wrapper);
-
+    
     if (this.pluginHasData()) {
       this.showFileData();
     } else {
       this.prepareUploadButton();
     }
-
+    
     holder.appendChild(this.nodes.wrapper);
-
+    
     return holder;
   }
 
+  renderSettings() {
+    const settings = this.config.settings;
+    const wrapper = document.createElement('div');
+
+    settings.forEach(tune => {
+      const title = this.api.i18n.t(tune.title);
+      let button = document.createElement('div');
+      button.classList.add('cdx-settings-button');
+      button.innerHTML = tune.icon;
+      if (tune.onClick)
+        button.addEventListener('click', () => {
+          tune.onClick({data: this.data, block: this});
+        });
+      this.api.tooltip.onHover(button, title, {
+        placement: 'top',
+      });
+      wrapper.appendChild(button);
+    });
+
+    return wrapper;
+  }
+  
   /**
-   * Prepares button for file uploading
-   */
+  * Prepares button for file uploading
+  */
   prepareUploadButton() {
     this.nodes.button = this.make('div', [this.CSS.apiButton, this.CSS.button]);
     this.nodes.button.innerHTML = `${Icon} ${this.config.buttonText}`;
     this.nodes.button.addEventListener('click', this.enableFileUpload);
     this.nodes.wrapper.appendChild(this.nodes.button);
   }
-
+  
   /**
-   * Fires after clicks on the Toolbox AttachesTool Icon
-   * Initiates click on the Select File button
-   *
-   * @public
-   */
-  appendCallback() {
+  * Fires after clicks on the Toolbox file-selectorTool Icon
+  * Initiates click on the Select File button
+  *
+  * @public
+  */
+  rendered() {
     this.nodes.button.click();
   }
-
+  
   /**
-   * Checks if any of Tool's fields have data
-   *
-   * @returns {boolean}
-   */
+  * Checks if any of Tool's fields have data
+  *
+  * @returns {boolean}
+  */
   pluginHasData() {
-    return this.data.title !== '' || Object.values(this.data.file).some(item => item !== undefined);
+    return this._displayData.title !== '' || Object.values(this._displayData.file).some(item => item !== undefined);
   }
-
+  
   /**
-   * Allow to upload files on button click
-   */
+  * Allow to upload files on button click
+  */
   enableFileUpload() {
     this.uploader.uploadSelectedFile({
       onPreview: () => {
@@ -270,90 +279,94 @@ export default class AttachesTool {
       }
     });
   }
-
+  
   /**
-   * File uploading callback
-   *
-   * @param {UploadResponseFormat} response
-   */
+  * File uploading callback
+  *
+  * @param {UploadResponseFormat} response
+  */
   onUpload(response) {
     const body = response;
-
+    
     if (body.success && body.file) {
-      const { url, name, size, title } = body.file;
-
-      this.data = {
+      const { name, size, title } = body.file;
+      
+      this._displayData = {
         file: {
-          url,
-          extension: name ? name.split('.').pop() : '',
+          extension: name ? name.split('.').pop().toLowerCase() : '',
           name,
           size,
         },
         title,
       };
-
+      
       this.nodes.button.remove();
       this.showFileData();
-      this.moveCaretToEnd(this.nodes.title);
-      this.nodes.title.focus();
+      //this.moveCaretToEnd(this.nodes.title);
+      //this.nodes.title.focus();
       this.removeLoader();
     } else {
       this.uploadingFailed(this.config.errorMessage);
     }
   }
-
+  
   /**
-   * Handles uploaded file's extension and appends corresponding icon
-   */
+  * Handles uploaded file's extension and appends corresponding icon
+  */
   appendFileIcon() {
-    const extension = this.data.file.extension || '';
+    const extension = this._displayData.file.extension || '';
     const extensionColor = this.EXTENSIONS[extension];
-
+    
     const fileIcon = this.make('div', this.CSS.fileIcon, {
       innerHTML: extensionColor ? CustomFileIcon : FileIcon
     });
-
+    
     if (extensionColor) {
       fileIcon.style.color = extensionColor;
+      if (extension.length > 3)
+        fileIcon.classList.add('longer');
+      else
+        fileIcon.classList.remove('longer');
       fileIcon.setAttribute('data-extension', extension);
     }
-
+    
     this.nodes.wrapper.appendChild(fileIcon);
   }
-
+  
   /**
-   * Removes tool's loader
-   */
+  * Removes tool's loader
+  */
   removeLoader() {
     setTimeout(() => this.nodes.wrapper.classList.remove(this.CSS.wrapperLoading, this.CSS.loader), LOADER_TIMEOUT);
   }
-
+  
   /**
-   * If upload is successful, show info about the file
-   */
+  * If upload is successful, show info about the file
+  */
   showFileData() {
+    this.nodes.wrapper.innerHTML = '';
     this.nodes.wrapper.classList.add(this.CSS.wrapperWithFile);
-
-    const { file: { size, url }, title } = this.data;
-
+    
+    const { file: { size }, title } = this._displayData;
+    
     this.appendFileIcon();
-
+    
     const fileInfo = this.make('div', this.CSS.fileInfo);
-
+    
     if (title) {
       this.nodes.title = this.make('div', this.CSS.title, {
-        contentEditable: true
+        contentEditable: false
       });
-
+      
       this.nodes.title.textContent = title;
       fileInfo.appendChild(this.nodes.title);
     }
-
+    
     if (size) {
       let sizePrefix;
       let formattedSize;
       const fileSize = this.make('div', this.CSS.size);
-
+      
       if (Math.log10(+size) >= 6) {
         sizePrefix = 'MiB';
         formattedSize = size / Math.pow(2, 20);
@@ -361,100 +374,94 @@ export default class AttachesTool {
         sizePrefix = 'KiB';
         formattedSize = size / Math.pow(2, 10);
       }
-
+      
       fileSize.textContent = formattedSize.toFixed(1);
       fileSize.setAttribute('data-size', sizePrefix);
       fileInfo.appendChild(fileSize);
     }
-
+    
     this.nodes.wrapper.appendChild(fileInfo);
 
-    const downloadIcon = this.make('a', this.CSS.downloadButton, {
-      innerHTML: DownloadIcon,
-      href: url,
-      target: '_blank',
-      rel: 'nofollow noindex noreferrer'
-    });
-
-    this.nodes.wrapper.appendChild(downloadIcon);
+    this.nodes.wrapper.addEventListener('click', this.enableFileUpload);
+    
+    // const downloadIcon = this.make('a', this.CSS.downloadButton, {
+    //   innerHTML: DownloadIcon,
+    //   href: url,
+    //   target: '_blank',
+    //   rel: 'nofollow noindex noreferrer'
+    // });
+    
+    // this.nodes.wrapper.appendChild(downloadIcon);
   }
-
+  
   /**
-   * If file uploading failed, remove loader and show notification
-   *
-   * @param {string} errorMessage -  error message
-   */
+  * If file uploading failed, remove loader and show notification
+  *
+  * @param {string} errorMessage -  error message
+  */
   uploadingFailed(errorMessage) {
     this.api.notifier.show({
       message: errorMessage,
       style: 'error'
     });
-
+    
     this.removeLoader();
   }
-
+  
   /**
-   * Return Attaches Tool's data
-   *
-   * @returns {AttachesToolData}
-   */
+  * Return file-selector Tool's data
+  *
+  * @returns {file-selectorToolData}
+  */
   get data() {
     return this._data;
   }
-
+  
   /**
-   * Stores all Tool's data
-   *
-   * @param {AttachesToolData} data
-   */
-  set data({ file, title }) {
-    this._data = Object.assign({}, {
-      file: {
-        url: (file && file.url) || this._data.file.url,
-        name: (file && file.name) || this._data.file.name,
-        extension: (file && file.extension) || this._data.file.extension,
-        size: (file && file.size) || this._data.file.size
-      },
-      title: title || this._data.title
-    });
+  * Stores all Tool's data
+  *
+  * @param {file-selectorToolData} data
+  */
+  set data(data) {
+    this._data = data || {};
   }
-
+  
   /**
-   * Moves caret to the end of contentEditable element
-   *
-   * @param {HTMLElement} element - contentEditable element
-   */
+  * Moves caret to the end of contentEditable element
+  *
+  * @param {HTMLElement} element - contentEditable element
+  */
   moveCaretToEnd(element) {
     const range = document.createRange();
     const selection = window.getSelection();
-
+    
     range.selectNodeContents(element);
     range.collapse(false);
     selection.removeAllRanges();
     selection.addRange(range);
   }
-
+  
   /**
-   * Helper method for elements creation
-   *
-   * @param tagName
-   * @param classNames
-   * @param attributes
-   * @returns {HTMLElement}
-   */
+  * Helper method for elements creation
+  *
+  * @param tagName
+  * @param classNames
+  * @param attributes
+  * @returns {HTMLElement}
+  */
   make(tagName, classNames = null, attributes = {}) {
     const el = document.createElement(tagName);
-
+    
     if (Array.isArray(classNames)) {
       el.classList.add(...classNames);
     } else if (classNames) {
       el.classList.add(classNames);
     }
-
+    
     for (const attrName in attributes) {
       el[attrName] = attributes[attrName];
     }
-
+    
     return el;
   }
 }

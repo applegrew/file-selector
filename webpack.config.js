@@ -6,7 +6,7 @@ module.exports = {
     path: __dirname + '/dist',
     publicPath: '/',
     filename: 'bundle.js',
-    library: 'AttachesTool',
+    library: 'FileSelectorTool',
     libraryTarget: 'umd',
     libraryExport: 'default'
   },
@@ -18,7 +18,7 @@ module.exports = {
         use: [
           {
             loader: 'babel-loader',
-            query: {
+            options: {
               presets: [ '@babel/preset-env' ]
             }
           }
@@ -42,7 +42,12 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        loader: 'svg-inline-loader?removeSVGTagAttrs=false'
+        use: {
+          loader: 'svg-inline-loader',
+          options: {
+            removeSVGTagAttrs: false
+          }
+        }
       }
     ]
   },

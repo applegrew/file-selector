@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/editor.js/2.24.3/editor.min.js"></script>
+        <script src="../dist/bundle.js"></script>
+    </head>
+    <body>
+        <div id="body"></div>
+        <script>
+            var editor = new EditorJS({
+                holder: "body",
+                tools: {
+                    file: {
+                        class: FileSelectorTool,
+                        config: {
+                            settings: [
+                                {
+                                    name: 'codeName',
+                                    icon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><path fill="none" d="M0 0h24v24H0z"/><path d="M20 9V5H4v4h16zm0 2H4v8h16v-8zM3 3h18a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm2 9h3v5H5v-5zm0-6h2v2H5V6zm4 0h2v2H9V6z"/></svg>`,
+                                    title: 'Code name',
+                                    onClick: ({data, block}) => {
+                                        alert(JSON.stringify(data))
+                                        const n = prompt("Enter code name");
+                                        if (n) {
+                                            block.data.codeName = n;
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                minHeight: 100,
+                placeholder: 'Article body here',
+            });
+        </script>
+    </body>
+</html>
