@@ -1,8 +1,9 @@
 ![](https://badgen.net/badge/Editor.js/v2.0/blue)
-# Attaches Tool
+# FileSelector Tool
 Attaches Tool for the [Editor.js](https://codex.so/editor).
 
-This tool allows you to attach files to your articles.
+This tool allows you to select files for your articles. This is a fork of Attaches Tool which is meant to just locally keep
+reference of the selected file and not upload it or provide option to download it.
 
 ![Example](https://capella.pics/7b63cffe-9214-40f4-9009-0637970a4630.jpg)
 
