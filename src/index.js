@@ -258,7 +258,7 @@ export default class FileSelectorTool {
   * @public
   */
   rendered() {
-    this.nodes.button.click();
+    // this.nodes.button.click();
   }
   
   /**
