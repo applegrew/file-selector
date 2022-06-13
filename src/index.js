@@ -89,7 +89,7 @@ export default class FileSelectorTool {
       uploader: config.uploader || undefined,
     };
     
-    this.data = data;
+    this._data = data || {};
     
     /**
     * Module for files uploading
