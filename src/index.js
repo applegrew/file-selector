@@ -222,6 +222,7 @@ export default class FileSelectorTool {
   renderSettings() {
     const settings = this.config.settings;
     const wrapper = document.createElement('div');
+    wrapper.classList.add('file-selector-settings');
 
     settings.forEach(tune => {
       const title = this.api.i18n.t(tune.title);
